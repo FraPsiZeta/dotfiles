@@ -1,3 +1,5 @@
+" Some common variables
+let plugin_path="~/.vim/bundle"
 
 " Configuration file for vim
 set modelines=0         " CVE-2007-2438
@@ -15,55 +17,47 @@ au BufWrite /private/tmp/crontab.* set nowritebackup nobackup
 au BufWrite /private/etc/pw.* set nowritebackup nobackup
 
 "Set terminal windowsize
-"
 set termwinsize=15x0
 set splitbelow
 tnoremap <Esc> <C-\><C-n>:q!<ENTER>
 
 "True-color terminal
-"
 set termguicolors
 
 "Set tree style as default for exploring folders
-"
 let g:netrw_liststyle=3
 
 "Allow to chnage buffer without saving
-"
 set hidden
 
 "Infinite recursion for find
-"
 set path+=**
 
 "Set system clipboard as default
-"
 set clipboard=unnamed
 
 "Test string for plugins install script
 
 " Plugins
-"
-set runtimepath+=~/.vim/boundle/vim-commentary
-set runtimepath+=~/.vim/boundle/vim-airline
-set runtimepath+=~/.vim/boundle/vim-indent-object
-set runtimepath+=~/.vim/boundle/gruvbox
-set runtimepath+=~/.vim/boundle/onedark.vim
-set runtimepath+=~/.vim/boundle/nord-vim
-set runtimepath+=~/.vim/boundle/vim-colors-solarized
-set runtimepath+=~/.vim/boundle/vim-hybrid-master
-set runtimepath+=~/.vim/boundle/vim-cpp-enhanced-highlight-master/after
-set runtimepath+=~/.vim/boundle/YouCompleteMe
-" set runtimepath+=~/.vim/boundle/syntastic
-set runtimepath+=~/.vim/boundle/ale
+let &runtimepath.="," . plugin_path . "/vim-commentary"
+let &runtimepath.="," . plugin_path . "/vim-airline"
+let &runtimepath.="," . plugin_path . "/vim-indent-object"
+let &runtimepath.="," . plugin_path . "/gruvbox"
+let &runtimepath.="," . plugin_path . "/onedark.vim"
+let &runtimepath.="," . plugin_path . "/nord-vim"
+let &runtimepath.="," . plugin_path . "/vim-colors-solarized"
+let &runtimepath.="," . plugin_path . "/vim-hybrid-master"
+let &runtimepath.="," . plugin_path . "/vim-cpp-enhanced-highlight-master/after"
+let &runtimepath.="," . plugin_path . "/YouCompleteMe"
+" let &runtimepah+="," . plugin_path . "/syntastic"
+let &runtimepath.="," . plugin_path . "/ale"
 
 " Ale
-
 let b:ale_linters=['flake8']
 let g:ale_fixers=['black']
 let g:ale_python_flake8_options='--ignore=E128,E127,E126,W504,E203,E501,E251'
 " Only run linters named in ale_linters settings.
-" let g:ale_linters_explicit = 1
+let g:ale_linters_explicit = 1
 
 " Syntastic
 "
@@ -83,19 +77,16 @@ map ,ccd :ALEDisable<CR>
 map ,ccc :ALEEnable<CR>
 
 "Cpp Syntax highlight options
-"
 let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
 let g:cpp_class_decl_highlight = 1
 
 "Commentary plugin
-"
 autocmd FileType cpp setlocal commentstring=//\ %s
 autocmd FileType cc setlocal commentstring=//\ %s
 autocmd FileType C setlocal commentstring=//\ %s
 
 " Themes and syntax
-"
 set background=dark
 set hlsearch
 colorscheme nord
@@ -103,24 +94,14 @@ colorscheme nord
 filetype plugin indent on
 syntax on
 
-
-" Poweline
-"
-" set rtp+=/usr/share/vim/addons/plugin/
-" python3 from powerline.vim import setup as powerline_setup
-" python3 powerline_setup()
-" python3 del powerline_setup
-
 set laststatus=2
 
 " Manual Tabs and spaces
-"
 set tabstop=4
 set shiftwidth=4
 set expandtab
 
 " Functions for tabs and spaces
-"
 function! UseTabs()
     set tabstop=2     " Size of a hard tabstop (ts).
     set shiftwidth=2  " Size of an indentation (sw).
@@ -148,11 +129,10 @@ set cursorline
 let mapleader=" "
 
 " YCM stuff
-"
 set encoding=utf-8
 
 let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_global_ycm_extra_conf = '~/.vim/boundle/YouCompleteMe/.ycm_extra_conf.py'
+let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_auto_trigger = 1
 
@@ -174,8 +154,8 @@ nnoremap K $
 nnoremap ,, ,
 nnoremap ,l /
 
+
 " Yaml stuff
-"
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
 " Latex stuff
