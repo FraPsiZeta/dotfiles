@@ -73,9 +73,6 @@ let g:ale_linters_explicit = 1
 " let g:syntastic_python_flake8_args='--ignore=E128,E126,E501,W504'
 " let g:syntastic_mode_map = { 'mode': 'passive' }
 
-map ,ccd :ALEDisable<CR>
-map ,ccc :ALEEnable<CR>
-
 "Cpp Syntax highlight options
 let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
@@ -126,24 +123,18 @@ endfunction
 set number relativenumber
 set cursorline
 
-let mapleader=" "
-
 " YCM stuff
 set encoding=utf-8
 
 let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
+let g:ycm_global_ycm_extra_conf = plugin_path . '/YouCompleteMe/.ycm_extra_conf.py'
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_auto_trigger = 1
 
-" Apply YCM FixIt
-map ,ac :YcmCompleter FixIt<CR>
-map ,gt :YcmCompleter GoTo<CR>
-map ,gtd :YcmCompleter GoToDefinition<CR>
-map ,ty :YcmCompleter GetType<CR>
-
 " Mappings
+map <space> <leader>
 
+" Common
 map ,., <esc>:wq<Enter>
 nnoremap <C-j> :bn<Enter>
 nnoremap <C-k> :bp<Enter>
@@ -153,7 +144,17 @@ inoremap jj <esc>
 nnoremap K $
 nnoremap ,, ,
 nnoremap ,l /
+noremap <leader>f :30vs .<Enter>
 
+" YCM
+map ,ac :YcmCompleter FixIt<CR>
+map ,gt :YcmCompleter GoTo<CR>
+map ,gtd :YcmCompleter GoToDefinition<CR>
+map ,ty :YcmCompleter GetType<CR>
+
+" ALE
+map ,ccd :ALEDisable<CR>
+map ,ccc :ALEEnable<CR>
 
 " Yaml stuff
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
