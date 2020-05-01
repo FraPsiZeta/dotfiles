@@ -57,7 +57,7 @@ let b:ale_linters=['flake8']
 let g:ale_fixers=['black']
 let g:ale_python_flake8_options='--ignore=E128,E127,E126,W504,E203,E501,E251'
 " Only run linters named in ale_linters settings.
-let g:ale_linters_explicit = 1
+" let g:ale_linters_explicit = 1
 
 " Syntastic
 "
@@ -135,7 +135,7 @@ let g:ycm_auto_trigger = 1
 map <space> <leader>
 
 " Common
-map ,., <esc>:wq<Enter>
+map <leader>., <esc>:wq<Enter>
 nnoremap <C-j> :bn<Enter>
 nnoremap <C-k> :bp<Enter>
 nnoremap <C-l> gt
@@ -143,18 +143,18 @@ nnoremap <C-h> gT
 inoremap jj <esc>
 nnoremap K $
 nnoremap ,, ,
-nnoremap ,l /
-noremap <leader>f :30vs .<Enter>
+nnoremap <leader>l /
+noremap <leader>dir :30vs .<Enter>
 
 " YCM
-map ,ac :YcmCompleter FixIt<CR>
-map ,gt :YcmCompleter GoTo<CR>
-map ,gtd :YcmCompleter GoToDefinition<CR>
-map ,ty :YcmCompleter GetType<CR>
+map <leader>ac :YcmCompleter FixIt<CR>
+map <leader>gt :YcmCompleter GoTo<CR>
+map <leader>gtd :YcmCompleter GoToDefinition<CR>
+map <leader>ty :YcmCompleter GetType<CR>
 
 " ALE
-map ,ccd :ALEDisable<CR>
-map ,ccc :ALEEnable<CR>
+map <leader>cd :ALEDisable<CR>
+map <leader>cc :ALEEnable<CR>
 
 " Yaml stuff
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
