@@ -19,10 +19,13 @@ au BufWrite /private/etc/pw.* set nowritebackup nobackup
 "Set terminal windowsize
 set termwinsize=15x0
 set splitbelow
-tnoremap <Esc> <C-\><C-n>:q!<ENTER>
+" Nor a great idea, it breaks Termdebug
+" tnoremap <Esc> <C-\><C-n>:q!<ENTER>
 
 "True-color terminal
 set termguicolors
+
+set mouse=a
 
 "Set tree style as default for exploring folders
 let g:netrw_liststyle=3
@@ -58,6 +61,11 @@ let g:ale_fixers=['black']
 let g:ale_python_flake8_options='--ignore=E128,E127,E126,W504,E203,E501,E251'
 " Only run linters named in ale_linters settings.
 " let g:ale_linters_explicit = 1
+let g:ale_enabled = 0
+autocmd FileType python :ALEToggle
+
+" Debug mode
+nnoremap <leader>debug <Esc>:packadd termdebug<Enter>:Termdebug<Enter><Ctrl-W><Ctrl-W><Ctrl-W>L
 
 " Syntastic
 "
@@ -127,7 +135,7 @@ set cursorline
 set encoding=utf-8
 
 let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_global_ycm_extra_conf = plugin_path . '/YouCompleteMe/.ycm_extra_conf.py'
+" let g:ycm_global_ycm_extra_conf = plugin_path . '/YouCompleteMe/.ycm_extra_conf.py'
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_auto_trigger = 1
 
@@ -141,6 +149,10 @@ nnoremap <C-k> :bp<Enter>
 nnoremap <C-l> gt
 nnoremap <C-h> gT
 inoremap jj <esc>
+inoremap " ""<esc>i
+inoremap ( ()<esc>i
+inoremap [ []<esc>i
+inoremap { {}<esc>i
 nnoremap K $
 nnoremap ,, ,
 nnoremap <leader>l /
