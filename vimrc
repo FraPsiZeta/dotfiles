@@ -54,18 +54,20 @@ let &runtimepath.="," . plugin_path . "/vim-cpp-enhanced-highlight-master/after"
 let &runtimepath.="," . plugin_path . "/YouCompleteMe"
 " let &runtimepah+="," . plugin_path . "/syntastic"
 let &runtimepath.="," . plugin_path . "/ale"
+packadd termdebug
 
 " Ale
 let b:ale_linters=['flake8']
 let g:ale_fixers=['black']
 let g:ale_python_flake8_options='--ignore=E128,E127,E126,W504,E203,E501,E251'
 " Only run linters named in ale_linters settings.
+" For some reason this one prevents ALE to lint new tabs
 " let g:ale_linters_explicit = 1
 let g:ale_enabled = 0
 autocmd FileType python :ALEToggle
 
 " Debug mode
-nnoremap <leader>debug <Esc>:packadd termdebug<Enter>:Termdebug<Enter><Ctrl-W><Ctrl-W><Ctrl-W>L
+nnoremap <leader>debug <Esc>:Termdebug<Enter><C-W><C-W><C-W>L<C-W><C-W>
 
 " Syntastic
 "
