@@ -19,13 +19,19 @@ au BufWrite /private/etc/pw.* set nowritebackup nobackup
 "Set terminal windowsize
 set termwinsize=15x0
 set splitbelow
-" Nor a great idea, it breaks Termdebug
-" tnoremap <Esc> <C-\><C-n>:q!<ENTER>
 
 "True-color terminal
 set termguicolors
 
 set mouse=a
+set number relativenumber
+set cursorline
+
+" Manual Tabs and spaces
+set tabstop=4
+set shiftwidth=4
+set expandtab
+
 
 "Set tree style as default for exploring folders
 let g:netrw_liststyle=3
@@ -56,21 +62,36 @@ let &runtimepath.="," . plugin_path . "/YouCompleteMe"
 let &runtimepath.="," . plugin_path . "/ale"
 packadd termdebug
 
-" Ale
+
+" ALE settings
+let g:ale_enabled = 0
 let b:ale_linters=['flake8']
 let g:ale_fixers=['black']
 let g:ale_python_flake8_options='--ignore=E128,E127,E126,W504,E203,E501,E251'
 " Only run linters named in ale_linters settings.
 " For some reason this one prevents ALE to lint new tabs
 " let g:ale_linters_explicit = 1
-let g:ale_enabled = 0
-autocmd FileType python :ALEToggle
+autocmd FileType python :ALEEnable
+map <leader>cc :ALEToggle<CR>
 
-" Debug mode
+
+" Termdebug settings
 nnoremap <leader>debug <Esc>:Termdebug<Enter><C-W><C-W><C-W>L<C-W><C-W>
-
-" Syntastic
 "
+" YouCompleteMe settings
+set encoding=utf-8
+
+let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_confirm_extra_conf = 0
+let g:ycm_auto_trigger = 1
+
+map <leader>ac :YcmCompleter FixIt<CR>
+map <leader>gt :YcmCompleter GoTo<CR>
+map <leader>gtd :YcmCompleter GoToDefinition<CR>
+map <leader>ty :YcmCompleter GetType<CR>
+
+
+" Syntastic settings
 " set statusline+=%#warningmsg#
 " set statusline+=%{SyntasticStatuslineFlag()}
 " set statusline+=%*
@@ -83,12 +104,7 @@ nnoremap <leader>debug <Esc>:Termdebug<Enter><C-W><C-W><C-W>L<C-W><C-W>
 " let g:syntastic_python_flake8_args='--ignore=E128,E126,E501,W504'
 " let g:syntastic_mode_map = { 'mode': 'passive' }
 
-"Cpp Syntax highlight options
-let g:cpp_class_scope_highlight = 1
-let g:cpp_member_variable_highlight = 1
-let g:cpp_class_decl_highlight = 1
-
-"Commentary plugin
+"Commentary settings
 autocmd FileType cpp setlocal commentstring=//\ %s
 autocmd FileType cc setlocal commentstring=//\ %s
 autocmd FileType C setlocal commentstring=//\ %s
@@ -103,10 +119,12 @@ syntax on
 
 set laststatus=2
 
-" Manual Tabs and spaces
-set tabstop=4
-set shiftwidth=4
-set expandtab
+"Cpp Syntax highlight options
+let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1
+let g:cpp_class_decl_highlight = 1
+
+
 
 " Functions for tabs and spaces
 function! UseTabs()
@@ -130,17 +148,6 @@ endfunction
 " au BufNewFile,BufRead *.py,*.pyx,*.pxd,Makefile call UseTabs()
 
 
-set number relativenumber
-set cursorline
-
-" YCM stuff
-set encoding=utf-8
-
-let g:ycm_autoclose_preview_window_after_insertion = 1
-" let g:ycm_global_ycm_extra_conf = plugin_path . '/YouCompleteMe/.ycm_extra_conf.py'
-let g:ycm_confirm_extra_conf = 0
-let g:ycm_auto_trigger = 1
-
 " Mappings
 map <space> <leader>
 
@@ -155,20 +162,9 @@ inoremap " ""<esc>i
 inoremap ( ()<esc>i
 inoremap [ []<esc>i
 inoremap { {}<esc>i
-nnoremap K $
 nnoremap ,, ,
 nnoremap <leader>l /
 noremap <leader>dir :30vs .<Enter>
-
-" YCM
-map <leader>ac :YcmCompleter FixIt<CR>
-map <leader>gt :YcmCompleter GoTo<CR>
-map <leader>gtd :YcmCompleter GoToDefinition<CR>
-map <leader>ty :YcmCompleter GetType<CR>
-
-" ALE
-map <leader>cd :ALEDisable<CR>
-map <leader>cc :ALEEnable<CR>
 
 " Yaml stuff
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
