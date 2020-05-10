@@ -84,6 +84,7 @@ set encoding=utf-8
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_auto_trigger = 1
+let g:ycm_max_diagnostics_to_display = 0
 
 map <leader>ac :YcmCompleter FixIt<CR>
 map <leader>gt :YcmCompleter GoTo<CR>
