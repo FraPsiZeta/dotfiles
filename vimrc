@@ -85,6 +85,7 @@ let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_auto_trigger = 1
 let g:ycm_max_diagnostics_to_display = 0
+let g:ycm_always_populate_location_list = 1
 
 map <leader>ac :YcmCompleter FixIt<CR>
 map <leader>gt :YcmCompleter GoTo<CR>
@@ -109,6 +110,26 @@ map <leader>ty :YcmCompleter GetType<CR>
 autocmd FileType cpp setlocal commentstring=//\ %s
 autocmd FileType cc setlocal commentstring=//\ %s
 autocmd FileType C setlocal commentstring=//\ %s
+
+" Mappings
+map <space> <leader>
+
+" Common
+map <leader>., <esc>:wq<Enter>
+nnoremap <C-j> :bn<Enter>
+nnoremap <C-k> :bp<Enter>
+nnoremap <C-l> gt
+nnoremap <C-h> gT
+inoremap jj <esc>
+inoremap " ""<esc>i
+inoremap ( ()<esc>i
+inoremap [ []<esc>i
+inoremap { {}<esc>i
+nnoremap ,, ,
+nnoremap <leader>l /
+noremap <leader>dir :30vs .<Enter>
+noremap <leader>fs :find %:t:r.
+
 
 " Themes and syntax
 set background=dark
@@ -147,25 +168,6 @@ endfunction
 " call UseSpaces()
 
 " au BufNewFile,BufRead *.py,*.pyx,*.pxd,Makefile call UseTabs()
-
-
-" Mappings
-map <space> <leader>
-
-" Common
-map <leader>., <esc>:wq<Enter>
-nnoremap <C-j> :bn<Enter>
-nnoremap <C-k> :bp<Enter>
-nnoremap <C-l> gt
-nnoremap <C-h> gT
-inoremap jj <esc>
-inoremap " ""<esc>i
-inoremap ( ()<esc>i
-inoremap [ []<esc>i
-inoremap { {}<esc>i
-nnoremap ,, ,
-nnoremap <leader>l /
-noremap <leader>dir :30vs .<Enter>
 
 " Yaml stuff
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
