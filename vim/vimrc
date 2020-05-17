@@ -27,10 +27,28 @@ set mouse=a
 set number relativenumber
 set cursorline
 
-" Manual Tabs and spaces
+"Spaces and tabs configurations
 set tabstop=4
 set shiftwidth=4
 set expandtab
+
+function! UseTabs(length)
+    let &tabstop=a:length     " Size of a hard tabstop (ts).
+    let &shiftwidth=a:length  " Size of an indentation (sw).
+    set noexpandtab   " Always uses tabs instead of space characters (noet).
+    set autoindent    " Copy indent from current line when starting a new line (ai).
+endfunction
+
+function! UseSpaces(length)
+    let &tabstop=a:length     " Size of a hard tabstop (ts).
+    let &shiftwidth=a:length  " Size of an indentation (sw).
+    set expandtab     " Always uses spaces instead of tab characters (et).
+    set softtabstop=0 " Number of spaces a <Tab> counts for. When 0, featuer is off (sts).
+    set autoindent    " Copy indent from current line when starting a new line.
+    set smarttab      " Inserts blanks on a <Tab> key (as per sw, ts and sts).
+endfunction
+
+" call UseSpaces(2)
 
 
 "Set tree style as default for exploring folders
@@ -48,18 +66,10 @@ set clipboard=unnamed
 "Test string for plugins install script
 
 " Plugins
-let &runtimepath.="," . plugin_path . "/vim-commentary"
-let &runtimepath.="," . plugin_path . "/vim-airline"
-let &runtimepath.="," . plugin_path . "/vim-indent-object"
-let &runtimepath.="," . plugin_path . "/gruvbox"
-let &runtimepath.="," . plugin_path . "/onedark.vim"
-let &runtimepath.="," . plugin_path . "/nord-vim"
-let &runtimepath.="," . plugin_path . "/vim-colors-solarized"
-let &runtimepath.="," . plugin_path . "/vim-hybrid-master"
-let &runtimepath.="," . plugin_path . "/vim-cpp-enhanced-highlight-master/after"
-let &runtimepath.="," . plugin_path . "/YouCompleteMe"
-" let &runtimepah+="," . plugin_path . "/syntastic"
-let &runtimepath.="," . plugin_path . "/ale"
+" Gets all folders inside plugin_path, and adds them to rtp
+let plugin_folders=globpath(plugin_path, '*')
+let plugin_folders=substitute(plugin_folders, '\n', ',', 'g')
+let &runtimepath.=plugin_folders
 packadd termdebug
 
 
@@ -76,7 +86,7 @@ map <leader>cc :ALEToggle<CR>
 
 
 " Termdebug settings
-nnoremap <leader>debug <Esc>:Termdebug<Enter><C-W><C-W><C-W>L<C-W><C-W>
+nnoremap <leader>dbg <Esc>:Termdebug<Enter><C-W><C-W><C-W>L<C-W><C-W><C-W><C-W>
 "
 " YouCompleteMe settings
 set encoding=utf-8
@@ -147,30 +157,6 @@ let g:cpp_member_variable_highlight = 1
 let g:cpp_class_decl_highlight = 1
 
 
-
-" Functions for tabs and spaces
-function! UseTabs()
-    set tabstop=2     " Size of a hard tabstop (ts).
-    set shiftwidth=2  " Size of an indentation (sw).
-    set noexpandtab   " Always uses tabs instead of space characters (noet).
-    set autoindent    " Copy indent from current line when starting a new line (ai).
-endfunction
-
-function! UseSpaces()
-    set tabstop=2     " Size of a hard tabstop (ts).
-    set shiftwidth=2  " Size of an indentation (sw).
-    set expandtab     " Always uses spaces instead of tab characters (et).
-    set softtabstop=0 " Number of spaces a <Tab> counts for. When 0, featuer is off (sts).
-    set autoindent    " Copy indent from current line when starting a new line.
-    set smarttab      " Inserts blanks on a <Tab> key (as per sw, ts and sts).
-endfunction
-
-" call UseSpaces()
-
-" au BufNewFile,BufRead *.py,*.pyx,*.pxd,Makefile call UseTabs()
-
-" Yaml stuff
-autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
 " Latex stuff
 
