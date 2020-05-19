@@ -69,7 +69,7 @@ set clipboard=unnamed
 " Gets all folders inside plugin_path, and adds them to rtp
 let plugin_folders=globpath(plugin_path, '*')
 let plugin_folders=substitute(plugin_folders, '\n', ',', 'g')
-let &runtimepath.=plugin_folders
+let &runtimepath.="," . plugin_folders
 packadd termdebug
 
 
