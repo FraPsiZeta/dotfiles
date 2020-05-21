@@ -1,6 +1,8 @@
-" Some common variables
+" Variables:
 let plugin_path="~/.vim/bundle"
 
+" Default:
+"
 " Configuration file for vim
 set modelines=0         " CVE-2007-2438
 set nomodeline
@@ -16,6 +18,8 @@ au BufWrite /private/tmp/crontab.* set nowritebackup nobackup
 " Don't write backup file if vim is being called by "chpass"
 au BufWrite /private/etc/pw.* set nowritebackup nobackup
 
+" Settings:
+"
 "Set terminal windowsize
 set termwinsize=15x0
 set splitbelow
@@ -63,9 +67,9 @@ set path+=**
 "Set system clipboard as default
 set clipboard=unnamed
 
-"Test string for plugins install script
 
-" Plugins
+" Plugins:
+"
 " Gets all folders inside plugin_path, and adds them to rtp
 let plugin_folders=globpath(plugin_path, '*')
 let plugin_folders=substitute(plugin_folders, '\n', ',', 'g')
@@ -86,7 +90,7 @@ map <leader>cc :ALEToggle<CR>
 
 
 " Termdebug settings
-nnoremap <leader>dbg <Esc>:Termdebug<Enter><C-W><C-W><C-W>L<C-W><C-W><C-W><C-W>
+nnoremap <leader>dbg <Esc>:Termdebug<Enter><C-W>w<C-W>L<C-W>w<C-W>w
 "
 " YouCompleteMe settings
 set encoding=utf-8
@@ -121,20 +125,33 @@ autocmd FileType cpp setlocal commentstring=//\ %s
 autocmd FileType cc setlocal commentstring=//\ %s
 autocmd FileType C setlocal commentstring=//\ %s
 
-" Mappings
+" Mappings:
+"
 map <space> <leader>
 
 " Common
 map <leader>., <esc>:wq<Enter>
+
 nnoremap <C-j> :bn<Enter>
 nnoremap <C-k> :bp<Enter>
 nnoremap <C-l> gt
 nnoremap <C-h> gT
+
 inoremap jj <esc>
-inoremap " ""<esc>i
-inoremap ( ()<esc>i
-inoremap [ []<esc>i
-inoremap { {}<esc>i
+
+inoremap " ""<left>
+inoremap ' ''<left>
+inoremap ( ()<left>
+inoremap [ []<left>
+inoremap { {}<left>
+inoremap {<CR> {<CR>}<ESC>O
+inoremap {;<CR> {<CR>};<ESC>O
+inoremap "" ""<left>
+inoremap '' ''<left>
+inoremap () ()<left>
+inoremap [] []<left>
+inoremap {} {}<left>
+
 nnoremap ,, ,
 nnoremap <leader>l /
 noremap <leader>dir :30vs .<Enter>
