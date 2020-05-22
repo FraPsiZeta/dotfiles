@@ -1,5 +1,5 @@
 "Spaces and tabs configurations
-set tabstop=4
-set shiftwidth=4
-set expandtab
+setlocal tabstop=4
+setlocal shiftwidth=4
+setlocal expandtab
 
