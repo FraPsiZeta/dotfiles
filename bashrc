@@ -3,6 +3,10 @@
 # for examples
 # PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w$ '
 
+# PS1="\[\033[01;34m\]» \[\033[01;32m\]Fra@Psi\[\033[01;34m\]╺\$([[ \$? != 0 ]] && echo \"\[\[\033[01;34m\]─[\033[0;31m\]\342\234\227\[\033[01;34m\]]\" || echo \"\[\[\033[01;34m\]─[\033[0;32m\]✓\[\033[01;34m\]]\")─╸\[\033[01;34m\][\[\033[00m\]\w\[\033[01;34m\]]\[\033[00m\]\[\033[00m\]\$ " #User
+# PS1='\[\033[01;29m\]» \[\033[01;31m\]\u@\h\[\033[01;37m\]╺─╸\[\033[01;37m\][\[\033[00m\]\w\[\033[01;37m\]]\[\033[00m\]\$ ' #Root
+
+PROMPT_DIRTRIM=2
 PROMPT_COMMAND=__prompt_command
 
 __prompt_command() {
@@ -29,7 +33,7 @@ __prompt_command() {
         code=$failed_code
     fi
 
-    PS1="${blue}${arrow} ${green}Fra@Psi${blue}╺─${code}─╸${blue}[${reset}\W${blue}]${reset} "
+    PS1="${blue}${arrow} ${green}Fra@Psi${blue}╺─${code}─╸${blue}[${reset}\w${blue}]${reset} "
 
 }
 
@@ -43,15 +47,27 @@ alias app='cd /home/frapsi/Software/NumericPlatform/PLAT_USERS/'
 
 alias work='ssh francesco@192.168.9.101'
 
+alias parav='~/Software/Paraview/bin/paraview &'
+
 fanblast(){ sudo fanblast.sh ; }
 
-cpu(){ echo ; echo "CPU Frequency:" ; echo ; cat /proc/cpuinfo | grep MHz ; echo "" ; echo "Temperature:"; echo ; sensors | grep "Core\|side" ; }
+cpu()
+{
+    local cpuinfo=$'CPU Frequency:\n\n'
+    cpuinfo+="$(cat /proc/cpuinfo | grep MHz)"$'\n\n'
+    cpuinfo+=$'Temperature:\n\n'
+    cpuinfo+="$(sensors | grep "Core\|side")"
+
+    printf "%s\n" "$cpuinfo"
+}
 
 batt(){ echo ; upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E "energy-full|energy-rate|time to|percentage|capacity"; echo; }
 
 alias watch='watch '
 
 alias l='ls -lah'
+
+export PYTHONDONTWRITEBYTECODE="NeverAgain"
 
 bat(){ echo "##################################";	
        echo -n "# Full Battery Design: " ; cat /sys/class/power_supply/BAT0/charge_full_design | tr '\n' ' '; echo ;
