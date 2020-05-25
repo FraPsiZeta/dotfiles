@@ -1,10 +1,15 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-# PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w$ '
+#: Set Colors with Nord color scheme
+test -r "~/.dir_colors" && eval $(dircolors ~/.dir_colors)
 
-# PS1="\[\033[01;34m\]» \[\033[01;32m\]Fra@Psi\[\033[01;34m\]╺\$([[ \$? != 0 ]] && echo \"\[\[\033[01;34m\]─[\033[0;31m\]\342\234\227\[\033[01;34m\]]\" || echo \"\[\[\033[01;34m\]─[\033[0;32m\]✓\[\033[01;34m\]]\")─╸\[\033[01;34m\][\[\033[00m\]\w\[\033[01;34m\]]\[\033[00m\]\[\033[00m\]\$ " #User
-# PS1='\[\033[01;29m\]» \[\033[01;31m\]\u@\h\[\033[01;37m\]╺─╸\[\033[01;37m\][\[\033[00m\]\w\[\033[01;37m\]]\[\033[00m\]\$ ' #Root
+#: Color for manpages in less makes manpages a little easier to read
+export LESS_TERMCAP_mb=$'\e[1;32m'
+export LESS_TERMCAP_md=$'\e[1;32m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[01;33m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[1;4;31m'
+
 
 PROMPT_DIRTRIM=2
 PROMPT_COMMAND=__prompt_command
@@ -41,6 +46,14 @@ export PATH=$PATH:/sbin:/usr/sbin:~/.local/bin
 
 bind TAB:menu-complete
 
+# Change directory aliases
+alias home='cd ~'
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+
 alias kdev='KDevelop-5.3.2-x86_64.AppImage &'
 
 alias app='cd /home/frapsi/Software/NumericPlatform/PLAT_USERS/'
@@ -49,7 +62,34 @@ alias work='ssh francesco@192.168.9.101'
 
 alias parav='~/Software/Paraview/bin/paraview &'
 
-fanblast(){ sudo fanblast.sh ; }
+# Extracts any archive(s) (if unp isn't installed)
+extract () {
+	for archive in $*; do
+		if [ -f $archive ] ; then
+			case $archive in
+				*.tar.bz2)   tar xvjf $archive    ;;
+				*.tar.gz)    tar xvzf $archive    ;;
+				*.bz2)       bunzip2 $archive     ;;
+				*.rar)       rar x $archive       ;;
+				*.gz)        gunzip $archive      ;;
+				*.tar)       tar xvf $archive     ;;
+				*.tbz2)      tar xvjf $archive    ;;
+				*.tgz)       tar xvzf $archive    ;;
+				*.zip)       unzip $archive       ;;
+				*.Z)         uncompress $archive  ;;
+				*.7z)        7z x $archive        ;;
+				*)           echo "don't know how to extract '$archive'..." ;;
+			esac
+		else
+			echo "'$archive' is not a valid file!"
+		fi
+	done
+}
+
+fanblast()
+{
+    sudo fanblast.sh
+}
 
 cpu()
 {
@@ -205,8 +245,6 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-
-test -r "~/.dir_colors" && eval $(dircolors ~/.dir_colors)
 
 alias NumericPlatform='export NUPLAT=/home/frapsi/Software/NumericPlatform && cd $NUPLAT && source plat_conf.sh && cd - '
 
