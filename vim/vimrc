@@ -139,15 +139,9 @@ nnoremap <C-h> gT
 
 inoremap jj <esc>
 
-inoremap ( ()<left>
-inoremap [ []<left>
-inoremap { {}<left>
+inoremap (<CR> (<CR>)<ESC>O
 inoremap {<CR> {<CR>}<ESC>O
 inoremap {;<CR> {<CR>};<ESC>O
-inoremap () ()<left>
-inoremap [] []<left>
-inoremap {} {}<left>
-inoremap <expr> )  strpart(getline('.'), col('.')-1, 1) == ")" ? ")" : "\<Right>"
 
 nnoremap ,, ,
 nnoremap <leader>l /
