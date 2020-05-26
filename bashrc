@@ -44,6 +44,9 @@ __prompt_command() {
 
 export PATH=$PATH:/sbin:/usr/sbin:~/.local/bin
 
+export EDITOR=vim
+export VISUAL=vim
+
 bind TAB:menu-complete
 
 # Change directory aliases
