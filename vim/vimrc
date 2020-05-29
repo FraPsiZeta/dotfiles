@@ -147,6 +147,8 @@ nnoremap ,, ,
 nnoremap <leader>l /
 noremap <leader>dir :30vs .<Enter>
 noremap <leader>fs :find %:t:r.
+" Used to toggle scrolloff, keep cursor centered
+nnoremap <leader>zz :let &scrolloff=999-&scrolloff<CR>
 
 
 " ThemesAndSyntax:
