@@ -1,8 +1,8 @@
 " Mappings:
 "
-inoremap <buffer> ,mm <Esc>:wa <bar> !pdflatex tesi.tex<ENTER>
+inoremap <buffer> ,mm <Esc>:wa <bar> !pdflatex %<ENTER>
 inoremap <buffer> ,kk <Esc>:wa <bar> !pdflatex % && open %:r.pdf<ENTER>
-noremap <buffer> ,mm <Esc>:wa <bar> !pdflatex tesi.tex<ENTER>
+noremap <buffer> ,mm <Esc>:wa <bar> !pdflatex %<ENTER>
 noremap <buffer> ,kk <Esc>:wa <bar> !pdflatex % && open %:r.pdf<ENTER>
 inoremap <buffer> ,e \begin{equation}<Enter><Enter>\end{equation}<Esc>ki
 inoremap <buffer> ,emp \emph{}<Esc>i
