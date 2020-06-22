@@ -27,7 +27,7 @@ set splitbelow
 "True-color terminal
 set termguicolors
 
-set mouse=a
+" set mouse=a
 set number relativenumber
 set cursorline
 
