@@ -127,6 +127,8 @@ let g:ycm_confirm_extra_conf = 0
 let g:ycm_auto_trigger = 1
 let g:ycm_max_diagnostics_to_display = 0
 let g:ycm_always_populate_location_list = 1
+" In order to let Jedi know where the root project is
+let $PYTHONPATH=getcwd() . ":" . $PYTHONPATH
 
 map <leader>ac :YcmCompleter FixIt<CR>
 map <leader>gt :YcmCompleter GoTo<CR>
