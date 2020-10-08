@@ -1,5 +1,39 @@
 " Variables:
-let plugin_path="~/.vim/bundle"
+" let plugin_path="~/.vim/bundle"
+"
+" Auto install of VimPlug
+"
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/plugged')
+
+function! BuildYCM(info)
+  " info is a dictionary with 3 fields
+  " - name:   name of the plugin
+  " - status: 'installed', 'updated', or 'unchanged'
+  " - force:  set on PlugInstall! or PlugUpdate!
+  if a:info.status == 'installed' || a:info.force
+    !./install.py --clangd-completer
+  endif
+endfunction
+
+Plug 'dense-analysis/ale'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'arcticicestudio/nord-vim'
+Plug 'vim-airline/vim-airline'
+Plug 'tpope/vim-commentary'
+Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'cespare/vim-toml'
+Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
+
+call plug#end()
 
 " Default:
 "
@@ -81,15 +115,21 @@ endif
 call VCenterCursor()
 
 
-
 "Set tree style as default for exploring folders
+let g:netrw_banner = 0
 let g:netrw_liststyle=3
+let g:netrw_browse_split = 4
+let g:netrw_winsize = 17
 
 "Allow to chnage buffer without saving
 set hidden
 
 "Infinite recursion for find
 set path+=**
+set wildignore+=**/venv/**
+set wildignore+=**/__pycache__/**
+set wildignore+=**/.mypy_cache/**
+set wildignore+=**/.svn/**
 
 "Set system clipboard as default
 set clipboard^=unnamed,unnamedplus
@@ -98,22 +138,60 @@ set clipboard^=unnamed,unnamedplus
 " Plugins:
 "
 " Gets all folders inside plugin_path, and adds them to rtp
-let plugin_folders=globpath(plugin_path, '*')
-let plugin_folders=substitute(plugin_folders, '\n', ',', 'g')
-let &runtimepath.="," . plugin_folders
+" let plugin_folders=globpath(plugin_path, '*')
+" let plugin_folders=substitute(plugin_folders, '\n', ',', 'g')
+" let &runtimepath.="," . plugin_folders
 packadd termdebug
 
 
+" CoC
+"
+" GoTo code navigation.
+nmap <silent> <leader>gd <Plug>(coc-definition)
+nmap <silent> <leader>gy <Plug>(coc-type-definition)
+nmap <silent> <leader>gi <Plug>(coc-implementation)
+nmap <silent> <leader>gr <Plug>(coc-references)
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Use <c-space>for trigger completion
+inoremap <silent><expr> <NUL> coc#refresh()
+
+" Use <tab> for trigger completion and navigate to the next complete item
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
+
+" Use Tab and S-Tab for scrolling completion list
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" Confirm selection with <Enter>
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
+
+noremap <leader>ss :CocCommand clangd.switchSourceHeader<Enter>
+noremap <leader>gs :CocCommand clangd.symbolInfo<Enter>
+
 " ALE settings
 let g:ale_enabled = 0
-let b:ale_linters=['flake8']
-let g:ale_fixers=['black']
-let g:ale_python_flake8_options='--ignore=E128,E127,E126,W504,E203,E501,E251'
+let g:ale_linters_explicit = 1
+let g:ale_linters={'python': ['mypy', 'flake8']}
 " Only run linters named in ale_linters settings.
 " For some reason this one prevents ALE to lint new tabs
-" let g:ale_linters_explicit = 1
+" let g:ale_fixers=['black']
+let g:ale_python_flake8_options='--ignore=E128,E127,E126,W503,W504,E203,E501,E251'
+let g:ale_python_pylint_options='--disable=C0103,C0111,C0112,C0202,R0913'
+let g:ale_python_mypv_options='-m'
+let g:ale_python_black_options='-l 79'
+" let g:ale_fix_on_save=1
 autocmd FileType python :ALEEnable
-map <leader>cc :ALEToggle<CR>
+map <leader>ad :ALEToggle<CR>
 
 
 " Termdebug settings
@@ -122,6 +200,9 @@ nnoremap <leader>dbg <Esc>:Termdebug<Enter><C-W>w<C-W>L<C-W>w<C-W>w
 " YouCompleteMe settings
 set encoding=utf-8
 
+" Disabled by default
+let g:loaded_youcompleteme = 1
+
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_auto_trigger = 1
@@ -129,11 +210,12 @@ let g:ycm_max_diagnostics_to_display = 0
 let g:ycm_always_populate_location_list = 1
 " In order to let Jedi know where the root project is
 let $PYTHONPATH=getcwd() . ":" . $PYTHONPATH
+let $MYPYPATH=getcwd() . ":" . $MYPYPATH
 
-map <leader>ac :YcmCompleter FixIt<CR>
-map <leader>gt :YcmCompleter GoTo<CR>
-map <leader>gtd :YcmCompleter GoToDefinition<CR>
-map <leader>ty :YcmCompleter GetType<CR>
+" map <leader>ac :YcmCompleter FixIt<CR>
+" map <leader>gt :YcmCompleter GoTo<CR>
+" map <leader>gtd :YcmCompleter GoToDefinition<CR>
+" map <leader>ty :YcmCompleter GetType<CR>
 
 
 " Syntastic settings
@@ -154,7 +236,7 @@ autocmd FileType cpp setlocal commentstring=//\ %s
 autocmd FileType cc setlocal commentstring=//\ %s
 autocmd FileType C setlocal commentstring=//\ %s
 
-" Mappings:
+" General Mappings:
 "
 map <space> <leader>
 
@@ -174,10 +256,16 @@ inoremap {;<CR> {<CR>};<ESC>O
 
 nnoremap ,, ,
 nnoremap <leader>l /
-noremap <leader>dir :30vs .<Enter>
-noremap <leader>fs :find %:t:r.
+nnoremap <leader>f :find 
+noremap <leader>e :Vex <Enter>
+noremap <leader>cc :bd <Enter>
 " Used to toggle scrolloff, keep cursor centered
 nnoremap <leader>zz :call VCenterCursor()<CR> 
+noremap <leader>vs :vs <Enter>
+noremap <leader><left> :vertical resize -5<Enter>
+noremap <leader><right> :vertical resize +5<Enter>
+noremap <leader><up> :resize +5<Enter>
+noremap <leader><down> :resize -5<Enter>
 
 
 " ThemesAndSyntax:
