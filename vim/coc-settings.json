@@ -1,0 +1,31 @@
+{
+    "diagnostic.checkCurrentLine": true,
+    "diagnostic.refreshOnInsertMode": true,
+    "diagnostic.refreshAfterSave": false,
+    "coc.preferences.formatOnSaveFiletypes": ["python"],
+    "coc.preferences.formatOnType": true,
+    "diagnostic.errorSign": "✗",
+    "diagnostic.warningSign": "⌬",
+    "diagnostic.infoSign": "ℹ",
+    "diagnostic.hintSign": "➤",
+    "suggest.echodocSupport": true,
+    "codeLens.enable": true,
+    "signature.enable": true,
+    "suggest.preferCompleteThanJumpPlaceholder": true,
+    "python.venvFolders": [
+        ".venv",
+        "venv"
+    ],
+    "python.analysis.diagnosticPublishDelay": 300,
+    "python.jediEnabled": true,
+    "python.analysis.diagnosticEnabled": false,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyEnabled": false,
+    "python.linting.flake8Path": "flake8",
+    "python.linting.mypyPath": "mypy",
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "black",
+    "python.formatting.blackArgs": ["-l", "79"],
+    "clangd.path": "/home/francesco/.config/coc/extensions/coc-clangd-data/install/10.0.0/clangd_10.0.0/bin/clangd"
+}
