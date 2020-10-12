@@ -35,15 +35,22 @@ This function should only modify configuration layer settings."
    '(
      ;; ----------------------------------------------------------------
      ;; Requirements needed in order to make the followings layers work:
-     ;; - sudo apt install ccls (https://github.com/MaskRay/ccls)
+     ;; - sudo apt-get install ccls (https://github.com/MaskRay/ccls)
+     ;; - sudo apt-get install nodejs (debug-layer)
+     ;;
+     ;; - M-x dap-gdb-lldb-setup (debug-layer)
+     ;;
      ;; - python -m pip install python-language-server[all]
      ;; - python -m pip install flake8
      ;; - python -m pip install mypy
      ;; - python -m pip install black
+     ;;
+     ;; - npm install -g eslint (js)
      ;; ----------------------------------------------------------------
      (lsp :variables
           lsp-enable-file-watchers t
           lsp-diagnostics-disabled-modes '(python-mode)
+          lsp-clients-clangd-args '("-j=4" "-background-index")
           lsp-file-watch-threshold 5000)
      (python :variables
              python-backend 'lsp
@@ -52,7 +59,7 @@ This function should only modify configuration layer settings."
              python-pipenv-activate t
              python-format-on-save t)
      (c-c++ :variables
-            c-c++-backend 'lsp-ccls
+            c-c++-backend 'lsp-clangd
             c-c++-adopt-subprojects t
             c-c++-enable-google-style t
             c-c++-adopt-subprojects t
@@ -63,7 +70,7 @@ This function should only modify configuration layer settings."
                       auto-completion-enable-sort-by-usage t)
      (shell :variables
             shell-default-height 30
-            shell-default-shell 'term
+            shell-default-shell 'ansi-term
             shell-default-position 'bottom)
      (syntax-checking :variables
                       syntax-checking-enable-tooltips t)
@@ -71,7 +78,10 @@ This function should only modify configuration layer settings."
                       version-control-diff-side 'left
                       version-control-global-margin nil
                       version-control-diff-tool 'git-gutter)
-     search-engine
+     (dap :variables
+          dap-ui-mode nil
+          dap-ui-controls-mode nil)
+     debug
      better-defaults
      emacs-lisp
      git
@@ -80,8 +90,10 @@ This function should only modify configuration layer settings."
      spacemacs-navigation
      markdown
      multiple-cursors
-     treemacs
+     (treemacs :variables
+               treemacs-width 28)
      org
+     javascript
      yaml)
 
 
@@ -555,8 +567,8 @@ before packages are loaded."
   (add-hook 'evil-insert-state-exit-hook
             (lambda () (spacemacs/toggle-syntax-checking-on)))
 
-  ;; Hide spacial buffers TODO
-  (add-to-list 'ido-ignore-buffers '"^*")
+  ;; Hide spacial buffers
+  (add-to-list 'spacemacs-useless-buffers-regexp '"^*")
   ;; ----------------------------------------------------------
 
   ;; Python stuff
@@ -641,8 +653,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   (quote
-    (git-gutter-fringe git-gutter neotree toml-mode ron-mode racer helm-gtags ggtags flycheck-rust counsel-gtags counsel swiper ivy cargo rust-mode poetry company-quickhelp package-lint list-utils packed yaml-mode telega rainbow-identifiers engine-mode nord-theme yasnippet-snippets yapfify xterm-color vterm unfill treemacs-magit terminal-here sphinx-doc smeargle shell-pop pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements orgit org-rich-yank org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain mwim multi-term mmm-mode markdown-toc magit-svn magit-section magit-gitflow magit-popup lsp-ui lsp-python-ms lsp-pyright lsp-origami origami live-py-mode importmagic epc ctable concurrent htmlize helm-rtags helm-pydoc helm-org-rifle helm-lsp helm-gitignore helm-git-grep helm-company helm-c-yasnippet google-c-style gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ fringe-helper git-gutter+ gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-ycmd flycheck-rtags flycheck-pos-tip pos-tip evil-org evil-magit magit git-commit with-editor transient eshell-z eshell-prompt-extras esh-help disaster dap-mode posframe lsp-treemacs bui cython-mode cpp-auto-include company-ycmd ycmd request-deferred deferred company-statistics company-rtags rtags company-c-headers company-anaconda company ccls lsp-mode markdown-mode dash-functional browse-at-remote blacken auto-yasnippet yasnippet auto-dictionary anaconda-mode pythonic ac-ispell auto-complete ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection spaceline-all-the-icons restart-emacs request rainbow-delimiters popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-ls-git helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav editorconfig dumb-jump dotenv-mode diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line))))
+   '(web-beautify prettier-js nodejs-repl livid-mode skewer-mode simple-httpd json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc realgud test-simple loc-changes load-relative git-gutter-fringe git-gutter neotree toml-mode ron-mode racer helm-gtags ggtags flycheck-rust counsel-gtags counsel swiper ivy cargo rust-mode poetry company-quickhelp package-lint list-utils packed yaml-mode telega rainbow-identifiers engine-mode nord-theme yasnippet-snippets yapfify xterm-color vterm unfill treemacs-magit terminal-here sphinx-doc smeargle shell-pop pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements orgit org-rich-yank org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain mwim multi-term mmm-mode markdown-toc magit-svn magit-section magit-gitflow magit-popup lsp-ui lsp-python-ms lsp-pyright lsp-origami origami live-py-mode importmagic epc ctable concurrent htmlize helm-rtags helm-pydoc helm-org-rifle helm-lsp helm-gitignore helm-git-grep helm-company helm-c-yasnippet google-c-style gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ fringe-helper git-gutter+ gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-ycmd flycheck-rtags flycheck-pos-tip pos-tip evil-org evil-magit magit git-commit with-editor transient eshell-z eshell-prompt-extras esh-help disaster dap-mode posframe lsp-treemacs bui cython-mode cpp-auto-include company-ycmd ycmd request-deferred deferred company-statistics company-rtags rtags company-c-headers company-anaconda company ccls lsp-mode markdown-mode dash-functional browse-at-remote blacken auto-yasnippet yasnippet auto-dictionary anaconda-mode pythonic ac-ispell auto-complete ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection spaceline-all-the-icons restart-emacs request rainbow-delimiters popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-ls-git helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav editorconfig dumb-jump dotenv-mode diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
