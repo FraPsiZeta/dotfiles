@@ -1,2 +1,0 @@
-# dotfiles
-Some useful dotfiles..

@@ -32,13 +32,23 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(systemd
+     html
      ;; ----------------------------------------------------------------
+     ;; Recommended installation:
+     ;; - sudo apt-get install libjansson-dev libgtk-3-dev libwebkit2gtk-4.0-dev libc6-dev libjpeg62-turbo libncurses5-dev libpng-dev libtiff5-dev libgif-dev xaw3dg-dev zlib1g-dev libx11-dev libgccjit-8-dev libgnutls28-dev
+     ;; - git clone git://git.savannah.gnu.org/emacs.git -b feature/native-comp
+     ;; - ./configure --with-native-compilation --with-json --with-cairo --with-xwidgets --with-x-toolkit=gtk3
+     ;;
      ;; Requirements needed in order to make the followings layers work:
      ;; - sudo apt-get install ccls (https://github.com/MaskRay/ccls)
      ;; - sudo apt-get install clangd clangd-format (make sure exec exists)
      ;; - sudo apt-get install nodejs (debug-layer)
-     ;; - sudo apt-get install silverseatcher-ag (helm-ag refactoring)
+     ;; - sudo apt-get install silversearcher-ag (helm-ag refactoring)
+     ;; - sudo apt-get install fd-find
+     ;; - sudo apt-get install texlive texliva-latex-extra texlive-latex-base(for org-to-latex)
+     ;; - sudo apt-get install shellcheck (shell-scripts layer)
+     ;; - pip install bashate (shell-scripts layer)
      ;;
      ;; - M-x dap-gdb-lldb-setup (debug-layer)
      ;; - M-x all-the-icons-install-fonts
@@ -54,24 +64,31 @@ This function should only modify configuration layer settings."
      ;;
      ;; In order to have pylint and mypy to work correctly, it's necessary
      ;; to add the following to flycheck.el (TODO better way):
-     ;; 
-     ;; (defun flycheck-pylint--find-project-root (_checker)
+     ;;
+     ;; (defun flycheck--find-project-root (_checker)
      ;;   "Find project root by searching for pyright config file."
-     ;;   (locate-dominating-file
-     ;;    (or buffer-file-name default-directory) ".projectile"))
+     ;;   (or (locate-dominating-file
+     ;;        (or buffer-file-name default-directory) ".projectile")
+     ;;       (locate-dominating-file
+     ;;        (or buffer-file-name default-directory) "setup.py")
+     ;;       (locate-dominating-file
+     ;;        (or buffer-file-name default-directory) "requirements.txt")
+     ;;       (locate-dominating-file
+     ;;        (or buffer-file-name default-directory) "pyproject.toml")))
      ;; [...]
-     ;; :working-directory flycheck-pylint--find-project-root
+     ;; :working-directory flycheck--find-project-root
      ;; [...]
      ;; ----------------------------------------------------------------
      (lsp :variables
-          lsp-enable-file-watchers t
-          lsp-ui-doc-position "at point"
-          lsp-ui-doc-enable nil
+          lsp-file-watch-threshold nil
+          lsp-ui-sideline-code-actions-prefix "💡 "
           lsp-diagnostics-disabled-modes '(python-mode)
-          lsp-clients-clangd-args '("-j=4" "-background-index")
-          lsp-file-watch-threshold 5000)
+          lsp-clients-clangd-args '("-j=4" "--clang-tidy" "-background-index")
+          lsp-rust-server 'rust-analyzer
+          lsp-rust-analyzer-server-display-inlay-hints t)
      (python :variables
              python-backend 'lsp
+             python-lsp-server 'pylsp
              python-formatter 'black
              python-test-runner 'pytest
              python-pipenv-activate t)
@@ -79,11 +96,11 @@ This function should only modify configuration layer settings."
      (c-c++ :variables
             c-c++-backend 'lsp-clangd
             c-c++-adopt-subprojects t
-            c-c++-adopt-subprojects t
             c-c++-enable-rtags-completion nil
             c-c++-lsp-enable-semantic-highlight t
-            c-c++-lsp-semantic-highlight-method 'overlay)
+            c-c++-lsp-semantic-highlight-method t)
      (auto-completion :variables
+                      auto-completion-enable-snippets-in-popup t
                       auto-completion-enable-sort-by-usage t)
      (shell :variables
             shell-default-height 30
@@ -93,7 +110,7 @@ This function should only modify configuration layer settings."
                       syntax-checking-enable-tooltips t)
      (version-control :variables
                       version-control-diff-side 'left
-                      version-control-global-margin nil
+                      version-control-global-margin t
                       version-control-diff-tool 'git-gutter)
      (dap :variables
           dap-ui-mode nil
@@ -104,6 +121,7 @@ This function should only modify configuration layer settings."
             cmake-backend 'lsp)
      (treemacs :variables
                treemacs-use-filewatch-mode t)
+     shell-scripts
      debug
      better-defaults
      emacs-lisp
@@ -112,10 +130,8 @@ This function should only modify configuration layer settings."
      helm
      spacemacs-navigation
      markdown
-     multiple-cursors
      org
      javascript)
-
 
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -124,7 +140,9 @@ This function should only modify configuration layer settings."
    ;; To use a local version of a package, use the `:location' property:
    ;; '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(nord-theme poetry)
+   dotspacemacs-additional-packages
+   '(nord-theme
+     poetry)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -256,6 +274,14 @@ It should only modify the values of Spacemacs settings."
    ;; Default major mode of the scratch buffer (default `text-mode')
    dotspacemacs-scratch-mode 'text-mode
 
+   ;; If non-nil, *scratch* buffer will be persistent. Things you write down in
+   ;; *scratch* buffer will be saved and restored automatically.
+   dotspacemacs-scratch-buffer-persistent nil
+
+   ;; If non-nil, `kill-buffer' on *scratch* buffer
+   ;; will bury it instead of killing.
+   dotspacemacs-scratch-buffer-unkillable nil
+
    ;; Initial message in the scratch buffer, such as "Welcome to Spacemacs!"
    ;; (default nil)
    dotspacemacs-initial-scratch-message nil
@@ -274,7 +300,7 @@ It should only modify the values of Spacemacs settings."
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
    dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
-   
+
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
@@ -435,9 +461,9 @@ It should only modify the values of Spacemacs settings."
    ;;   :size-limit-kb 1000)
    ;; When used in a plist, `visual' takes precedence over `relative'.
    ;; (default nil)
-   dotspacemacs-line-numbers 'relative
+   dotspacemacs-line-numbers nil
 
-   ;; Code folding method. Possible values are `evil' and `origami'.
+   ;; Code folding method. Possible values are `evil', `origami' and `vimish'.
    ;; (default 'evil)
    dotspacemacs-folding-method 'evil
 
@@ -584,8 +610,10 @@ before packages are loaded."
   ;; Hide trailing whitespaces
   (setq-default spacemacs-show-trailing-whitespace nil)
 
-  ;; Center cursor
+  ;; Cursor options
   (global-centered-cursor-mode)
+  (customize-set-variable 'line-move-visual nil)
+  (customize-set-variable 'scroll-conservatively 1001)
 
   ;; <C-i> problems
   (setq-default dotspacemacs-distinguish-gui-tab t)
@@ -602,7 +630,6 @@ before packages are loaded."
   (add-hook 'python-mode-hook
             (lambda () (add-hook 'evil-insert-state-exit-hook
                                  'my:syntax-on nil 'make-it-local)))
-
 
   ;; Hide spacial buffers
   (add-to-list 'spacemacs-useless-buffers-regexp '"^*")
@@ -659,11 +686,15 @@ before packages are loaded."
   ;; Hide points in bullet lists
   (setq org-hide-leading-stars nil)
   (setq org-superstar-leading-bullet ?\s)
+
+  ;; Table caption under
+  (customize-set-variable 'org-latex-table-caption-above nil)
+  (customize-set-variable 'org-latex-caption-above nil)
   ;; ------------------------------------
 
   ;; Custom shortcuts
   ;; ----------------
-  (spacemacs/set-leader-keys "op" 'poetry)
+  ;; (spacemacs/set-leader-keys "op" 'poetry)
   (spacemacs/set-leader-keys "ol" 'lsp-ui-doc-glance)
 
   (define-key evil-normal-state-map (kbd "C-i") 'evil-jump-forward)
@@ -673,16 +704,23 @@ before packages are loaded."
   ;; -------------------------
   (spacemacs/set-leader-keys "pm" 'projectile-add-known-project)
   (spacemacs/set-leader-keys "pM" 'projectile-remove-known-project)
-  
+
+  ;; Default path for pytest
+  (setq-default pytest-project-root-files '("setup.py" ".git" ".hg" "pyproject.toml" ".projectile"))
+
   ;; Directory to ignore in fuzzyfind, <SPC p f>
   (defvar my:custom-ignored-directories
         '(
-          "*/venv*"
-          "venv*"
+          "*/venv/*"
+          "venv/*"
           "*/.*"
+          "__pycache__"
+          "*tar.gz"
           "*.egg-info*"
-          "build*"
-          "*/build*"))
+          "build/*"
+          "*/target/*"
+          "docs/*"
+          "*/build/*"))
   (defvar my:fuzzyfind-cmd
         (if (executable-find "fdfind")
             (concat "fdfind . --exclude '" (mapconcat 'identity my:custom-ignored-directories "' --exclude '") "' -0 --type f --color=never")
@@ -691,7 +729,7 @@ before packages are loaded."
   (with-eval-after-load 'projectile
     (mapc (lambda (x)
             (add-to-list 'projectile-globally-ignored-directories x))
-          '(".mypy_cache" ".venv" "venv" ".pytest_cache" "__pycache__" "build" "dist")))
+          '(".mypy_cache" "target" "docs" ".venv" "venv" ".pytest_cache" "__pycache__" "build" "dist" "*.egg-info*")))
   (customize-set-variable 'projectile-track-known-projects-automatically nil)
   (customize-set-variable 'projectile-svn-command my:fuzzyfind-cmd)
   (customize-set-variable 'projectile-git-command my:fuzzyfind-cmd)
@@ -712,8 +750,45 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
+ '(evil-escape-delay 0.2)
+ '(evil-want-Y-yank-to-eol nil)
+ '(flycheck-checker-error-threshold 2000)
+ '(flycheck-disabled-checkers '(python-flake8))
+ '(flycheck-display-errors-delay 0.2)
+ '(hl-todo-keyword-faces
+   '(("TODO" . "#dc752f")
+     ("NEXT" . "#dc752f")
+     ("THEM" . "#2d9574")
+     ("PROG" . "#4f97d7")
+     ("OKAY" . "#4f97d7")
+     ("DONT" . "#f2241f")
+     ("FAIL" . "#f2241f")
+     ("DONE" . "#86dc2f")
+     ("NOTE" . "#b1951d")
+     ("KLUDGE" . "#b1951d")
+     ("HACK" . "#b1951d")
+     ("TEMP" . "#b1951d")
+     ("FIXME" . "#dc752f")
+     ("XXX+" . "#dc752f")
+     ("\\?\\?\\?+" . "#dc752f")))
+ '(line-move-visual nil)
+ '(org-latex-caption-above nil t)
+ '(org-latex-table-caption-above nil t)
  '(package-selected-packages
-   '(doom-modeline shrink-path treemacs-all-the-icons helm-ctest cmake-mode web-beautify prettier-js nodejs-repl livid-mode skewer-mode simple-httpd json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc realgud test-simple loc-changes load-relative git-gutter-fringe git-gutter neotree toml-mode ron-mode racer helm-gtags ggtags flycheck-rust counsel-gtags counsel swiper ivy cargo rust-mode poetry company-quickhelp package-lint list-utils packed yaml-mode telega rainbow-identifiers engine-mode nord-theme yasnippet-snippets yapfify xterm-color vterm unfill treemacs-magit terminal-here sphinx-doc smeargle shell-pop pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements orgit org-rich-yank org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain mwim multi-term mmm-mode markdown-toc magit-svn magit-section magit-gitflow magit-popup lsp-ui lsp-python-ms lsp-pyright lsp-origami origami live-py-mode importmagic epc ctable concurrent htmlize helm-rtags helm-pydoc helm-org-rifle helm-lsp helm-gitignore helm-git-grep helm-company helm-c-yasnippet google-c-style gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ fringe-helper git-gutter+ gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-ycmd flycheck-rtags flycheck-pos-tip pos-tip evil-org evil-magit magit git-commit with-editor transient eshell-z eshell-prompt-extras esh-help disaster dap-mode posframe lsp-treemacs bui cython-mode cpp-auto-include company-ycmd ycmd request-deferred deferred company-statistics company-rtags rtags company-c-headers company-anaconda company ccls lsp-mode markdown-mode dash-functional browse-at-remote blacken auto-yasnippet yasnippet auto-dictionary anaconda-mode pythonic ac-ispell auto-complete ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection spaceline-all-the-icons restart-emacs request rainbow-delimiters popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-ls-git helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav editorconfig dumb-jump dotenv-mode diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
+   '(diff-hl yasnippet-snippets yapfify yaml-mode xterm-color ws-butler writeroom-mode visual-fill-column winum web-mode web-beautify vterm volatile-highlights vi-tilde-fringe uuidgen unfill undo-tree treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toml-mode toc-org terminal-here tagedit systemd symon symbol-overlay string-inflection sphinx-doc spaceline-all-the-icons memoize all-the-icons spaceline powerline smeargle slim-mode shell-pop scss-mode sass-mode ron-mode restart-emacs realgud test-simple loc-changes load-relative rainbow-delimiters racer pytest pyenv-mode py-isort pug-mode prettier-js popwin pippel pipenv pyvenv pip-requirements persp-mode password-generator paradox overseer orgit org-superstar org-rich-yank org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain open-junk-file nord-theme nodejs-repl nameless mwim multi-term move-text mmm-mode markdown-toc magit-svn magit-section magit-gitflow magit-popup macrostep lsp-ui lsp-python-ms lsp-pyright lsp-origami origami lorem-ipsum livid-mode skewer-mode live-py-mode link-hint json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc insert-shebang indent-guide importmagic epc ctable concurrent impatient-mode simple-httpd hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-xref helm-themes helm-swoop helm-rtags helm-pydoc helm-purpose window-purpose imenu-list helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-ls-git helm-gitignore helm-git-grep helm-flx helm-descbinds helm-ctest helm-css-scss helm-company helm-c-yasnippet helm-ag haml-mode google-translate google-c-style golden-ratio gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe fringe-helper git-gutter gh-md fuzzy forge magit ghub closql emacsql-sqlite emacsql treepy git-commit with-editor transient pos-tip package-lint flx-ido flx fish-mode fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-cleverparens smartparens evil-args evil-anzu anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emr iedit projectile paredit list-utils emmet-mode elisp-slime-nav editorconfig dumb-jump disaster dired-quick-sort devdocs define-word dap-mode lsp-treemacs bui treemacs cfrs pfuture posframe cython-mode cpp-auto-include company-ycmd ycmd pkg-info request-deferred request deferred epl company-web web-completion-data company-statistics company-shell company-rtags rtags company-c-headers company-anaconda company column-enforce-mode cmake-mode clean-aindent-mode clang-format centered-cursor-mode ccls lsp-mode spinner ht dash-functional cargo markdown-mode rust-mode browse-at-remote blacken auto-yasnippet yasnippet auto-highlight-symbol auto-compile packed anaconda-mode pythonic f dash s aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core ac-ispell auto-complete popup which-key use-package pcre2el org-plus-contrib hydra lv hybrid-mode font-lock+ evil goto-chg dotenv-mode diminish bind-map bind-key async))
+ '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
+ '(projectile-generic-command
+   "fdfind . --exclude '*/venv/*' --exclude 'venv/*' --exclude '*/.*' --exclude '__pycache__' --exclude '*tar.gz' --exclude '*.egg-info*' --exclude 'build/*' --exclude '*/build/*' -0 --type f --color=never")
+ '(projectile-git-command
+   "fdfind . --exclude '*/venv/*' --exclude 'venv/*' --exclude '*/.*' --exclude '__pycache__' --exclude '*tar.gz' --exclude '*.egg-info*' --exclude 'build/*' --exclude '*/build/*' -0 --type f --color=never")
+ '(projectile-svn-command
+   "fdfind . --exclude '*/venv/*' --exclude 'venv/*' --exclude '*/.*' --exclude '__pycache__' --exclude '*tar.gz' --exclude '*.egg-info*' --exclude 'build/*' --exclude '*/build/*' -0 --type f --color=never")
+ '(projectile-track-known-projects-automatically nil)
+ '(scroll-conservatively 1001)
+ '(warning-suppress-log-types '((comp) (comp) (comp)))
+ '(warning-suppress-types '((comp) (comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

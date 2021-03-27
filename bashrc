@@ -10,8 +10,11 @@ export LESS_TERMCAP_so=$'\e[01;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;31m'
 
+if [[ $TERM = dumb ]]; then return; fi
 
-PROMPT_DIRTRIM=2
+# PROMPT related stuff:
+
+PROMPT_DIRTRIM=3
 PROMPT_COMMAND=__prompt_command
 
 __prompt_command() {
@@ -31,18 +34,26 @@ __prompt_command() {
 
     local failed_code="[${red}${failed}${blue}]"
     local success_code="[${green}${tick}${blue}]"
-    local code=$success_code
-
 
     if [ $exit_code != 0 ]; then
         code=$failed_code
+    else
+        code=$success_code
+    fi
+    # Determine active Python virtualenv details.
+    if test -z "$VIRTUAL_ENV" ; then
+        PYTHON_VIRTUALENV=""
+    else
+        PYTHON_VIRTUALENV="${BLUE}[`basename \"$VIRTUAL_ENV\"`]${COLOR_NONE} "
     fi
 
-    PS1="${blue}${arrow} ${green}Fra@Psi${blue}╺─${code}─╸${blue}[${reset}\w${blue}]${reset} "
+    PS1="${PYTHON_VIRTUALENV}${blue}${arrow} ${green}Fra@Psi${blue}╺─${code}─╸${blue}[${reset}\w${blue}]${reset} "
 
 }
 
-export PATH=$PATH:/sbin:/usr/sbin:~/.local/bin
+export PATH=$PATH:/sbin:/usr/sbin:~/.local/bin:~/.poetry/bin
+
+export BROWSER=/usr/bin/firefox
 
 export EDITOR=vim
 export VISUAL=vim
@@ -57,13 +68,32 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 
+alias emacs='emacsclient -c -n -a ""'
+alias emacst='emacsclient -t -a ""'
+alias telegram='/home/francesco/Scaricati/Telegram/Telegram &>/dev/null &'
 alias kdev='KDevelop-5.3.2-x86_64.AppImage &'
+
+efind() {
+grep -nRI "$1" --exclude-dir='.svn' --exclude-dir='.mypy_cache' --exclude-dir='venv' --exclude-dir='.venv' .
+}
+
+elist() {
+grep -lr "$1" --exclude-dir='.svn' --exclude-dir='.mypy_cache' --exclude-dir='venv' --exclude-dir='.venv' .
+}
 
 alias app='cd /home/frapsi/Software/NumericPlatform/PLAT_USERS/'
 
 alias work='ssh francesco@192.168.9.101'
 
+alias sadel="cd ~/Software/sadel"
+
+alias cld="cd ~/Software/sadel/cld"
+
+alias aruba="cd ~/Software/sadel/aruba_collaudo/Aruba/Aruba8_Collaudo_AP/arubaapi/arubaapi/"
+
 alias parav='~/Software/Paraview/bin/paraview &'
+
+
 
 # Extracts any archive(s) (if unp isn't installed)
 extract () {
@@ -89,40 +119,7 @@ extract () {
 	done
 }
 
-fanblast()
-{
-    sudo fanblast.sh
-}
-
-cpu()
-{
-    local cpuinfo=$'CPU Frequency:\n\n'
-    cpuinfo+="$(cat /proc/cpuinfo | grep MHz)"$'\n\n'
-    cpuinfo+=$'Temperature:\n\n'
-    cpuinfo+="$(sensors | grep "Core\|side")"
-
-    printf "%s\n" "$cpuinfo"
-}
-
-batt(){ echo ; upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E "energy-full|energy-rate|time to|percentage|capacity"; echo; }
-
-alias watch='watch '
-
-alias l='ls -lah'
-
 export PYTHONDONTWRITEBYTECODE="NeverAgain"
-
-bat(){ echo "##################################";	
-       echo -n "# Full Battery Design: " ; cat /sys/class/power_supply/BAT0/charge_full_design | tr '\n' ' '; echo ;
-       echo -n  "# Full Battery: " ; cat /sys/class/power_supply/BAT0/charge_full | tr '\n' ' '; echo ;
-       echo -n  "# Remaining Battery: " ; cat /sys/class/power_supply/BAT0/charge_now  | tr '\n' ' '; echo ;
-       stato=$(cat /sys/class/power_supply/BAT0/status) ;
-       if [ "$stato" = "Discharging" ]; then 
-	       echo -n  "# Power Drain: " ; cat /sys/class/power_supply/BAT0/current_avg | awk  '{ printf "\033[31m%13s\033[0m mAh #", $1 }' ; echo;
-       elif [ "$stato" = "Charging" ]; then 
-	       echo -n  "# Power Charge: " ; cat /sys/class/power_supply/BAT0/current_avg | awk  '{ printf "\033[37m%12s\033[0m mAh #", $1 }' ; echo ; 
-       fi ;
-       echo "##################################"; }
 
 # If not running interactively, don't do anything
 case $- in
@@ -137,10 +134,6 @@ HISTCONTROL=ignoreboth
 # append to the history file, don't overwrite it
 shopt -s histappend
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-#HISTSIZE=1000
-#HISTFILESIZE=2000
-
 # Eternal bash history.
 # ---------------------
 # Undocumented feature which sets the size to "unlimited".
@@ -153,7 +146,7 @@ export HISTTIMEFORMAT="[%F %T] "
 #export HISTFILE=~/.bash_eternal_history
 # Force prompt to write history after every command.
 # http://superuser.com/questions/20900/bash-history-loss
-PROMPT_COMMAND="$PROMPT_COMMAND; history -a"
+PROMPT_COMMAND="$PROMPT_COMMAND ; history -a"
 
 
 # check the window size after each command and, if necessary,
@@ -162,10 +155,7 @@ shopt -s checkwinsize
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
-#shopt -s globstar
-
-# make less more friendly for non-text input files, see lesspipe(1)
-#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+shopt -s globstar
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -193,22 +183,6 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-# if [ "$color_prompt" = yes ]; then
-#     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-# else
-#     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-# fi
-# unset color_prompt force_color_prompt
-
-# If this is an xterm set the title to user@host:dir
-# case "$TERM" in
-# xterm*|rxvt*)
-#     PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-#     ;;
-# *)
-#     ;;
-# esac
-
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -222,12 +196,12 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # some more ls aliases
-#alias ll='ls -l'
-#alias la='ls -A'
-#alias l='ls -CF'
+alias ll='ls -lah'
+alias la='ls -A'
+alias l='ls -CF'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -248,6 +222,4 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-
-alias NumericPlatform='export NUPLAT=/home/frapsi/Software/NumericPlatform && cd $NUPLAT && source plat_conf.sh && cd - '
 
