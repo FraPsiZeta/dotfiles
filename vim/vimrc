@@ -268,7 +268,9 @@ noremap <leader><down> :resize -5<Enter>
 "
 set background=dark
 set hlsearch
-colorscheme nord
+if AUTO_CONFIGURE
+    colorscheme nord
+endif
 
 filetype plugin indent on
 syntax on
